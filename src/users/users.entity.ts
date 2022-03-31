@@ -22,6 +22,9 @@ export class Users extends BaseEntity {
   @Column()
   password: string;
 
+  @Column()
+  is_admin: boolean;
+
   @CreateDateColumn({
     type: 'timestamp',
     default: () => 'CURRENT_TIMESTAMP(7)',

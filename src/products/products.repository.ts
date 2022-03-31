@@ -4,7 +4,10 @@ import { Products } from './product.entity';
 
 @EntityRepository(Products)
 export class ProductsRepository extends Repository<Products> {
-  async createProduct(CreateProductDto: CreateProductDto): Promise<Products> {
+  async createProduct(
+    CreateProductDto: CreateProductDto,
+    file,
+  ): Promise<Products> {
     const { name, price, description, information, in_stock } =
       CreateProductDto;
     const product = this.create({
@@ -13,8 +16,9 @@ export class ProductsRepository extends Repository<Products> {
       description,
       information,
       in_stock,
+      image_url: file.path,
     });
-
+    console.log(file);
     await this.save(product);
     return product;
   }

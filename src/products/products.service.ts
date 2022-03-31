@@ -11,7 +11,7 @@ export class ProductsService {
     private productRepository: ProductsRepository,
   ) {}
 
-  createProduct(CreateProductDto: CreateProductDto): Promise<Products> {
-    return this.productRepository.createProduct(CreateProductDto);
+  createProduct(CreateProductDto: CreateProductDto, file): Promise<Products> {
+    return this.productRepository.createProduct(CreateProductDto, file);
   }
 }

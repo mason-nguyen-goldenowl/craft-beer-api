@@ -7,6 +7,9 @@ import { CartsModule } from './carts/carts.module';
 import { CartItemModule } from './cart_item/cart_item.module';
 import { OrdersModule } from './orders/orders.module';
 import { OrderItemModule } from './order_item/order_item.module';
+import { MulterModule } from '@nestjs/platform-express';
+import { ServeStaticModule } from '@nestjs/serve-static';
+import { join } from 'path';
 
 @Module({
   imports: [
@@ -20,6 +23,10 @@ import { OrderItemModule } from './order_item/order_item.module';
       database: 'craftbeer',
       autoLoadEntities: true,
       synchronize: true,
+    }),
+    MulterModule.register({ dest: './uploads' }),
+    ServeStaticModule.forRoot({
+      rootPath: join(__dirname, '..', 'uploads'),
     }),
     UsersModule,
     CartsModule,

@@ -21,6 +21,9 @@ export class Products extends BaseEntity {
   @Column()
   price: number;
 
+  @Column({ nullable: true })
+  image_url: string;
+
   @Column()
   description: string;
 
