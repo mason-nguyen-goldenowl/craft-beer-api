@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CreateProductDto } from './dto/create-product.dto';
-import { Product } from './product.entity';
+import { Products } from './product.entity';
 import { ProductsRepository } from './products.repository';
 
 @Injectable()
@@ -11,7 +11,7 @@ export class ProductsService {
     private productRepository: ProductsRepository,
   ) {}
 
-  createProduct(CreateProductDto: CreateProductDto): Promise<Product> {
+  createProduct(CreateProductDto: CreateProductDto): Promise<Products> {
     return this.productRepository.createProduct(CreateProductDto);
   }
 }
