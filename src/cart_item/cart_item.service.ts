@@ -1,5 +1,8 @@
 import { HttpException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { Carts } from 'src/carts/carts.entity';
+import { Products } from 'src/products/product.entity';
+
 import { Cart_items } from './cart_item.entity';
 import { CartItemsRepository } from './cart_item.repoository';
 
@@ -10,7 +13,20 @@ export class CartItemService {
     private cartItemsRepository: CartItemsRepository,
   ) {}
 
-  async createCartItem({ product, price, cart }) {
+  async getCartItem(cart: Carts): Promise<Cart_items[]> {
+    const cartItems = await this.cartItemsRepository.find({ where: { cart } });
+
+    return cartItems;
+  }
+
+  async CartItemExits(cart: Carts, product: Products): Promise<Cart_items> {
+    const cartItem = await this.cartItemsRepository.findOne({
+      where: { cart, product },
+    });
+    return cartItem;
+  }
+
+  async createCartItem({ product, price, cart }): Promise<Cart_items> {
     const cartItem = await this.cartItemsRepository.create({
       product,
       quantity: 1,

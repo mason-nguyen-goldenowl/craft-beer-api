@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { HttpException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CartsService } from 'src/carts/carts.service';
 import { Cart_items } from 'src/cart_item/cart_item.entity';
@@ -60,19 +60,32 @@ export class ProductsService {
     );
   }
 
-  async addToCart(id: string, user: Users): Promise<Cart_items> {
+  async decreasingStock(id: string, quantity): Promise<void> {
     const product = await this.getProductById(id);
-    // console.log(cart);
+    product.in_stock -= quantity;
+    if (product.in_stock <= 0) {
+      product.sold_down = true;
+    }
+    await this.productRepository.save(product);
+  }
+
+  async addToCart(id: string, user: Users): Promise<void> {
+    const product = await this.getProductById(id);
 
     let cart = await this.cartsService.getCart(user);
 
     if (!cart) {
       cart = await this.cartsService.createCart(user);
     }
-    return this.cartItemsService.createCartItem({
-      product,
-      cart,
-      price: product.price,
-    });
+    let cartItem = await this.cartItemsService.CartItemExits(cart, product);
+    if (cartItem) {
+      await this.cartItemsService.increasingQuantityCartItem(cartItem.id);
+    } else {
+      cartItem = await this.cartItemsService.createCartItem({
+        product,
+        cart,
+        price: product.price,
+      });
+    }
   }
 }

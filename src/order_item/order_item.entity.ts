@@ -38,11 +38,11 @@ export class Order_items extends BaseEntity {
 
   @ManyToOne((_type) => Orders, (order) => order.order_items, { eager: false })
   @Exclude({ toPlainOnly: true })
-  orders: Orders;
+  order: Orders;
 
   @ManyToOne((_type) => Products, (products) => products.order_items, {
     eager: false,
   })
   @Exclude({ toPlainOnly: true })
-  products: Products;
+  product: Products;
 }

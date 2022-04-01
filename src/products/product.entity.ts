@@ -33,6 +33,9 @@ export class Products extends BaseEntity {
   @Column()
   in_stock: number;
 
+  @Column({ default: false })
+  sold_down: boolean;
+
   @CreateDateColumn({
     type: 'timestamp',
     default: () => 'CURRENT_TIMESTAMP()',
@@ -46,7 +49,7 @@ export class Products extends BaseEntity {
   })
   public updated_at: Date;
 
-  @OneToMany((_type) => Order_items, (order_items) => order_items.products, {
+  @OneToMany((_type) => Order_items, (order_items) => order_items.product, {
     eager: true,
   })
   order_items: Order_items[];

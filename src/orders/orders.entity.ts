@@ -17,8 +17,8 @@ export class Orders extends BaseEntity {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @Column()
-  orderInformation: string;
+  @Column({ default: 0 })
+  total: number;
 
   @CreateDateColumn({
     type: 'timestamp',
@@ -37,7 +37,7 @@ export class Orders extends BaseEntity {
   @Exclude({ toPlainOnly: true })
   user: Users;
 
-  @OneToMany((_type) => Order_items, (order_items) => order_items.orders, {
+  @OneToMany((_type) => Order_items, (order_items) => order_items.order, {
     eager: true,
   })
   order_items: Order_items[];

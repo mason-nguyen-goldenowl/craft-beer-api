@@ -1,4 +1,17 @@
-import { Controller } from '@nestjs/common';
+import { Controller, Post, UseGuards } from '@nestjs/common';
+import { AuthGuard } from '@nestjs/passport';
+import { GetUser } from 'src/users/get-user.decorator';
+import { Users } from 'src/users/users.entity';
+import { Orders } from './orders.entity';
+import { OrdersService } from './orders.service';
 
 @Controller('orders')
-export class OrdersController {}
+@UseGuards(AuthGuard())
+export class OrdersController {
+  constructor(private orderService: OrdersService) {}
+
+  @Post('/create')
+  createOrder(@GetUser() user: Users): Promise<Orders> {
+    return this.orderService.createOrder(user);
+  }
+}

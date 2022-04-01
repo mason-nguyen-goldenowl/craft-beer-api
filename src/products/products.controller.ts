@@ -77,10 +77,7 @@ export class ProductsController {
   }
 
   @Post('/cart/add/:id')
-  addToCart(
-    @Param('id') id: string,
-    @GetUser() user: Users,
-  ): Promise<Cart_items> {
+  addToCart(@Param('id') id: string, @GetUser() user: Users): Promise<void> {
     return this.productsService.addToCart(id, user);
   }
 }
