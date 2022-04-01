@@ -34,7 +34,7 @@ export class Products extends BaseEntity {
   in_stock: number;
 
   @Column({ default: false })
-  sold_down: boolean;
+  sold_out: boolean;
 
   @CreateDateColumn({
     type: 'timestamp',

@@ -64,7 +64,8 @@ export class ProductsService {
     const product = await this.getProductById(id);
     product.in_stock -= quantity;
     if (product.in_stock <= 0) {
-      product.sold_down = true;
+      product.sold_out = true;
+      throw new HttpException('Product is sold out', 400);
     }
     await this.productRepository.save(product);
   }
