@@ -1,9 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 
-import { GetUser } from 'src/users/get-user.decorator';
 import { Users } from 'src/users/users.entity';
-import { Carts } from './carts.entity';
+
 import { CartsRepository } from './carts.repository';
 
 @Injectable()

@@ -1,16 +1,5 @@
-import {
-  forwardRef,
-  HttpException,
-  Inject,
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
+import { HttpException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { NotContains } from 'class-validator';
-import { Carts } from 'src/carts/carts.entity';
-import { Products } from 'src/products/product.entity';
-import { ProductsService } from 'src/products/products.service';
-import { Users } from 'src/users/users.entity';
 import { Cart_items } from './cart_item.entity';
 import { CartItemsRepository } from './cart_item.repoository';
 
@@ -32,7 +21,7 @@ export class CartItemService {
     return cartItem;
   }
 
-  async increasingQuatityCartItem(id: string): Promise<Cart_items> {
+  async increasingQuantityCartItem(id: string): Promise<Cart_items> {
     const carItemUpdate = await this.cartItemsRepository.findOne({
       where: { id },
     });
@@ -47,13 +36,13 @@ export class CartItemService {
     return carItemUpdate;
   }
 
-  async decreasingQuatityCartItem(id: string): Promise<Cart_items> {
+  async decreasingQuantityCartItem(id: string): Promise<Cart_items> {
     const carItemUpdate = await this.cartItemsRepository.findOne({
       where: { id },
     });
 
     if (carItemUpdate.quantity === 1 || carItemUpdate.quantity <= 0) {
-      throw new HttpException('Please add quatity of product', 400);
+      throw new HttpException('Please add quantity of product', 400);
     }
     carItemUpdate.quantity--;
     await this.cartItemsRepository.save(carItemUpdate);

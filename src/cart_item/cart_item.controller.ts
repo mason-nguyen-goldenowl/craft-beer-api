@@ -8,12 +8,12 @@ export class CartItemController {
 
   @Post('/increasing/:id')
   increasingQuatityCartItem(@Param('id') id: string): Promise<Cart_items> {
-    return this.cartItemService.increasingQuatityCartItem(id);
+    return this.cartItemService.increasingQuantityCartItem(id);
   }
 
   @Post('/decreasing/:id')
   decreassingQuatityCartItem(@Param('id') id: string): Promise<Cart_items> {
-    return this.cartItemService.decreasingQuatityCartItem(id);
+    return this.cartItemService.decreasingQuantityCartItem(id);
   }
 
   @Delete('/delete/:id')

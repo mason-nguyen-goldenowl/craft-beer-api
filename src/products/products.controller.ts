@@ -5,25 +5,22 @@ import {
   Get,
   Param,
   Post,
-  Query,
   UploadedFile,
   UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
+import { AuthGuard } from '@nestjs/passport';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { CreateProductDto } from './dto/create-product.dto';
-import { Products } from './product.entity';
-import { ProductsService } from './products.service';
-import { extname, join } from 'path';
 import { diskStorage } from 'multer';
-import { GetProductFilterDto } from './dto/get-product-filter.dto';
+import { Cart_items } from 'src/cart_item/cart_item.entity';
 import { fileName } from 'src/ultils/img-update.ultils';
-import { UpdateProductDto } from './dto/update-product.dto';
-import { CartsService } from 'src/carts/carts.service';
 import { GetUser } from 'src/users/get-user.decorator';
 import { Users } from 'src/users/users.entity';
-import { Cart_items } from 'src/cart_item/cart_item.entity';
-import { AuthGuard } from '@nestjs/passport';
+
+import { CreateProductDto } from './dto/create-product.dto';
+import { UpdateProductDto } from './dto/update-product.dto';
+import { Products } from './product.entity';
+import { ProductsService } from './products.service';
 
 @Controller('products')
 @UseGuards(AuthGuard())
