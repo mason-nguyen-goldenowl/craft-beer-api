@@ -13,7 +13,6 @@ import { join } from 'path';
 
 @Module({
   imports: [
-    ProductsModule,
     TypeOrmModule.forRoot({
       type: 'postgres',
       host: 'localhost',
@@ -28,6 +27,7 @@ import { join } from 'path';
     ServeStaticModule.forRoot({
       rootPath: join(__dirname, '..', 'uploads'),
     }),
+    ProductsModule,
     UsersModule,
     CartsModule,
     CartItemModule,

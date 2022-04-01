@@ -1,3 +1,4 @@
+import { Exclude } from 'class-transformer';
 import { Carts } from 'src/carts/carts.entity';
 import { Orders } from 'src/orders/orders.entity';
 import {
@@ -5,6 +6,7 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  JoinColumn,
   OneToMany,
   OneToOne,
   PrimaryGeneratedColumn,
@@ -16,13 +18,28 @@ export class Users extends BaseEntity {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @Column()
+  @Column({ unique: true })
   email: string;
 
   @Column()
   password: string;
 
   @Column()
+  country: string;
+
+  @Column()
+  street_address: string;
+
+  @Column()
+  city: string;
+
+  @Column()
+  state: string;
+
+  @Column()
+  phone: string;
+
+  @Column({ default: false })
   is_admin: boolean;
 
   @CreateDateColumn({
@@ -37,10 +54,9 @@ export class Users extends BaseEntity {
     onUpdate: 'CURRENT_TIMESTAMP(7)',
   })
   public updated_at: Date;
-
+  @OneToOne((_type) => Carts, (cart) => cart.user)
+  @JoinColumn()
+  cart: Carts;
   @OneToMany((_type) => Orders, (order) => order.user, { eager: true })
   orders: Orders[];
-
-  @OneToOne((_type) => Carts, (cart) => cart.user, { eager: true })
-  carts: Carts;
 }

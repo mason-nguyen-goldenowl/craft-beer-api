@@ -1,8 +1,13 @@
 import {
   Body,
   Controller,
+  Delete,
+  Get,
+  Param,
   Post,
+  Query,
   UploadedFile,
+  UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
@@ -11,23 +16,41 @@ import { Products } from './product.entity';
 import { ProductsService } from './products.service';
 import { extname, join } from 'path';
 import { diskStorage } from 'multer';
+import { GetProductFilterDto } from './dto/get-product-filter.dto';
+import { fileName } from 'src/ultils/img-update.ultils';
+import { UpdateProductDto } from './dto/update-product.dto';
+import { CartsService } from 'src/carts/carts.service';
+import { GetUser } from 'src/users/get-user.decorator';
+import { Users } from 'src/users/users.entity';
+import { Cart_items } from 'src/cart_item/cart_item.entity';
+import { AuthGuard } from '@nestjs/passport';
 
 @Controller('products')
+@UseGuards(AuthGuard())
 export class ProductsController {
   constructor(private productsService: ProductsService) {}
+
+  @Get()
+  getProducts(): Promise<Products[]> {
+    return this.productsService.getProducts();
+  }
+
+  @Get('/:id')
+  getProductById(@Param('id') id: string): Promise<Products> {
+    return this.productsService.getProductById(id);
+  }
+
+  @Delete('/:id')
+  deleteProductById(@Param('id') id: string): Promise<void> {
+    return this.productsService.deleteProductById(id);
+  }
 
   @Post()
   @UseInterceptors(
     FileInterceptor('image', {
       storage: diskStorage({
         destination: './uploads',
-        filename: (req, file, cb) => {
-          const randomName = Array(32)
-            .fill(null)
-            .map(() => Math.round(Math.random() * 16).toString(16))
-            .join('');
-          return cb(null, `${randomName}${extname(file.originalname)}`);
-        },
+        filename: fileName,
       }),
     }),
   )
@@ -37,5 +60,30 @@ export class ProductsController {
   ): Promise<Products> {
     console.log(file);
     return this.productsService.createProduct(CreateProductDto, file);
+  }
+
+  @Post('/update/:id')
+  @UseInterceptors(
+    FileInterceptor('image', {
+      storage: diskStorage({
+        destination: './uploads',
+        filename: fileName,
+      }),
+    }),
+  )
+  updateProductById(
+    @Param('id') id: string,
+    @Body() UpdateProductDto: UpdateProductDto,
+    @UploadedFile() file,
+  ): Promise<Products> {
+    return this.productsService.updateProductById(id, UpdateProductDto, file);
+  }
+
+  @Post('/cart/add/:id')
+  addToCart(
+    @Param('id') id: string,
+    @GetUser() user: Users,
+  ): Promise<Cart_items> {
+    return this.productsService.addToCart(id, user);
   }
 }

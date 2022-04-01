@@ -3,8 +3,10 @@ import { Cart_items } from 'src/cart_item/cart_item.entity';
 import { Users } from 'src/users/users.entity';
 import {
   BaseEntity,
+  Column,
   CreateDateColumn,
   Entity,
+  JoinColumn,
   OneToMany,
   OneToOne,
   PrimaryGeneratedColumn,
@@ -29,8 +31,8 @@ export class Carts extends BaseEntity {
   })
   public updated_at: Date;
 
-  @OneToOne((_type) => Users, (user) => user.carts, { eager: false })
-  @Exclude({ toPlainOnly: true })
+  @OneToOne((_type) => Users, (user) => user.cart)
+  @JoinColumn()
   user: Users;
 
   @OneToMany((_type) => Cart_items, (cart_items) => cart_items.cart, {
