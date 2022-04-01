@@ -7,6 +7,7 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  JoinColumn,
   ManyToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
@@ -41,8 +42,7 @@ export class Cart_items extends BaseEntity {
   cart: Carts;
 
   @ManyToOne((_type) => Products, (products) => products.cart_items, {
-    eager: false,
+    eager: true,
   })
-  @Exclude({ toPlainOnly: true })
   product: Products;
 }

@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { forwardRef, Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { CartsModule } from 'src/carts/carts.module';
 import { CartItemModule } from 'src/cart_item/cart_item.module';

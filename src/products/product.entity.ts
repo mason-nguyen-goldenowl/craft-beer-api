@@ -5,6 +5,7 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  JoinColumn,
   OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
@@ -51,8 +52,6 @@ export class Products extends BaseEntity {
   })
   order_items: Order_items[];
 
-  @OneToMany((_type) => Cart_items, (cart_items) => cart_items.product, {
-    eager: true,
-  })
+  @OneToMany((_type) => Cart_items, (cart_items) => cart_items.product)
   cart_items: Cart_items[];
 }
