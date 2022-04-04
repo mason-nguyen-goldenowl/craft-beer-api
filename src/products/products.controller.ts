@@ -12,24 +12,24 @@ import {
 import { AuthGuard } from '@nestjs/passport';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
-import { Cart_items } from 'src/cart_item/cart_item.entity';
 import { fileName } from 'src/ultils/img-update.ultils';
-import { GetUser } from 'src/users/get-user.decorator';
+import { GetUser } from 'src/users/common/decorator/get-user.decorator';
 import { Users } from 'src/users/users.entity';
 
 import { CreateProductDto } from './dto/create-product.dto';
+import { GetProductFilterDto } from './dto/get-product-filter.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { Products } from './product.entity';
 import { ProductsService } from './products.service';
 
 @Controller('products')
-@UseGuards(AuthGuard())
 export class ProductsController {
   constructor(private productsService: ProductsService) {}
 
   @Get()
-  getProducts(): Promise<Products[]> {
-    return this.productsService.getProducts();
+  getProducts(@Body() filterDto: GetProductFilterDto): Promise<Products[]> {
+    console.log(filterDto);
+    return this.productsService.getProducts(filterDto);
   }
 
   @Get('/:id')
@@ -37,12 +37,17 @@ export class ProductsController {
     return this.productsService.getProductById(id);
   }
 
+  @UseGuards(AuthGuard())
   @Delete('/:id')
-  deleteProductById(@Param('id') id: string): Promise<void> {
-    return this.productsService.deleteProductById(id);
+  deleteProductById(
+    @Param('id') id: string,
+    @GetUser() user: Users,
+  ): Promise<void> {
+    return this.productsService.deleteProductById(id, user);
   }
 
   @Post()
+  @UseGuards(AuthGuard())
   @UseInterceptors(
     FileInterceptor('image', {
       storage: diskStorage({
@@ -53,13 +58,14 @@ export class ProductsController {
   )
   createProduct(
     @Body() CreateProductDto: CreateProductDto,
+    @GetUser() user: Users,
     @UploadedFile() file,
   ): Promise<Products> {
-    console.log(file);
-    return this.productsService.createProduct(CreateProductDto, file);
+    return this.productsService.createProduct(CreateProductDto, user, file);
   }
 
   @Post('/update/:id')
+  @UseGuards(AuthGuard())
   @UseInterceptors(
     FileInterceptor('image', {
       storage: diskStorage({
@@ -72,12 +78,28 @@ export class ProductsController {
     @Param('id') id: string,
     @Body() UpdateProductDto: UpdateProductDto,
     @UploadedFile() file,
+    @GetUser() user: Users,
   ): Promise<Products> {
-    return this.productsService.updateProductById(id, UpdateProductDto, file);
+    return this.productsService.updateProductById(
+      id,
+      UpdateProductDto,
+      user,
+      file,
+    );
   }
 
   @Post('/cart/add/:id')
+  @UseGuards(AuthGuard())
   addToCart(@Param('id') id: string, @GetUser() user: Users): Promise<void> {
     return this.productsService.addToCart(id, user);
+  }
+
+  @Post('/restore/:id')
+  @UseGuards(AuthGuard())
+  restoreProduct(
+    @Param('id') id: string,
+    @GetUser() user: Users,
+  ): Promise<void> {
+    return this.productsService.restoreProductById(id, user);
   }
 }

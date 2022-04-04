@@ -41,6 +41,7 @@ export class Cart_items extends BaseEntity {
   cart: Carts;
 
   @ManyToOne((_type) => Products, (products) => products.cart_items, {
+    onDelete: 'CASCADE',
     eager: true,
   })
   product: Products;

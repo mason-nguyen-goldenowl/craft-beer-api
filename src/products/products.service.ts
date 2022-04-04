@@ -1,13 +1,16 @@
-import { HttpException, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  HttpException,
+  Injectable,
+  NotFoundException,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { CartsService } from 'src/carts/carts.service';
-import { Cart_items } from 'src/cart_item/cart_item.entity';
 import { CartItemService } from 'src/cart_item/cart_item.service';
-import { GetUser } from 'src/users/get-user.decorator';
+import { CartsService } from 'src/carts/carts.service';
 import { Users } from 'src/users/users.entity';
 
 import { CreateProductDto } from './dto/create-product.dto';
-
+import { GetProductFilterDto } from './dto/get-product-filter.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { Products } from './product.entity';
 import { ProductsRepository } from './products.repository';
@@ -21,51 +24,101 @@ export class ProductsService {
     private cartItemsService: CartItemService,
   ) {}
 
-  getProducts(): Promise<Products[]> {
-    return this.productRepository.getProducts();
-  }
+  async getProducts(filterDto: GetProductFilterDto): Promise<Products[]> {
+    const { lowPrice, highPrice } = filterDto;
+    const products = await this.productRepository.find();
+    const filterProducts = [];
 
-  async deleteProductById(id: string): Promise<void> {
-    const result = await this.productRepository.delete(id);
+    products.map((product) => {
+      if (product.price >= lowPrice && product.price <= highPrice) {
+        filterProducts.push(product);
+      }
+    });
 
-    if (result.affected === 0) {
-      throw new NotFoundException('Product not found');
+    if (Object.keys(filterDto).length > 0) {
+      return filterProducts;
+    } else {
+      return products;
     }
   }
 
   async getProductById(id: string): Promise<Products> {
-    const found = await this.productRepository.findOne({ where: { id } });
+    const found = await this.productRepository.findOne({
+      where: { id },
+    });
     if (!found) {
       throw new NotFoundException('Product not found');
     }
     return found;
   }
 
-  createProduct(CreateProductDto: CreateProductDto, file): Promise<Products> {
-    return this.productRepository.createProduct(CreateProductDto, file);
+  async createProduct(
+    CreateProductDto: CreateProductDto,
+    user: Users,
+    file,
+  ): Promise<Products> {
+    if (!user.is_admin) {
+      throw new UnauthorizedException('Not allowed');
+    }
+    const { name, price, description, information, in_stock } =
+      CreateProductDto;
+    const product = this.productRepository.create({
+      name,
+      price,
+      description,
+      information,
+      in_stock,
+      image_url: file.filename,
+    });
+
+    await this.productRepository.save(product);
+    return product;
   }
 
   async updateProductById(
     id: string,
     UpdateProductDto: UpdateProductDto,
+    user: Users,
     file,
   ): Promise<Products> {
+    if (!user.is_admin) {
+      throw new UnauthorizedException('Not allowed');
+    }
     const product = await this.getProductById(id);
+    const { name, description, information, price, in_stock } =
+      UpdateProductDto;
 
-    return this.productRepository.updateProductById(
-      id,
-      UpdateProductDto,
-      product,
-      file,
-    );
+    if (name) {
+      product.name = name;
+    }
+    if (description) {
+      product.description = description;
+    }
+    if (information) {
+      product.information = information;
+    }
+    if (price) {
+      product.price = price;
+    }
+    if (in_stock) {
+      product.in_stock = in_stock;
+    }
+    if (file) {
+      product.image_url = file.filename;
+    }
+
+    await this.productRepository.save(product);
+    return product;
   }
 
   async decreasingStock(id: string, quantity): Promise<void> {
     const product = await this.getProductById(id);
     product.in_stock -= quantity;
-    if (product.in_stock <= 0) {
+    if (product.in_stock === 0) {
       product.sold_out = true;
-      throw new HttpException('Product is sold out', 400);
+    }
+    if (product.in_stock < 0) {
+      throw new HttpException('Product in stock is not enough for you', 400);
     }
     await this.productRepository.save(product);
   }
@@ -87,6 +140,32 @@ export class ProductsService {
         cart,
         price: product.price,
       });
+    }
+  }
+
+  async deleteProductById(id: string, user: Users): Promise<void> {
+    if (!user.is_admin) {
+      throw new UnauthorizedException('Not allowed');
+    }
+    const productDelete = await this.getProductById(id);
+
+    if (!productDelete) {
+      throw new NotFoundException('Product not found');
+    }
+
+    productDelete.deleted_at = new Date();
+    await this.productRepository.save(productDelete);
+  }
+
+  async restoreProductById(id: string, user: Users): Promise<void> {
+    if (!user.is_admin) {
+      throw new UnauthorizedException('Not allowed');
+    }
+
+    const productRestore = await this.productRepository.restore(id);
+
+    if (!productRestore) {
+      throw new NotFoundException('Product not found');
     }
   }
 }

@@ -38,6 +38,9 @@ export class Users extends BaseEntity {
   @Column()
   phone: string;
 
+  @Column({ nullable: true })
+  hashedRT: string;
+
   @Column({ default: false })
   is_admin: boolean;
 

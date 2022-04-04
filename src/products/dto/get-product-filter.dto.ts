@@ -1,6 +1,9 @@
-import { IsNumber } from 'class-validator';
+import { IsNumber, IsOptional } from 'class-validator';
 
 export class GetProductFilterDto {
-  @IsNumber()
-  price?: number;
+  @IsOptional()
+  lowPrice?: number;
+
+  @IsOptional()
+  highPrice?: number;
 }

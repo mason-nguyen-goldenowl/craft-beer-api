@@ -29,7 +29,7 @@ export class Carts extends BaseEntity {
   })
   public updated_at: Date;
 
-  @OneToOne((_type) => Users, (user) => user.cart)
+  @OneToOne((_type) => Users, (user) => user.cart, { onDelete: 'CASCADE' })
   @JoinColumn()
   user: Users;
 

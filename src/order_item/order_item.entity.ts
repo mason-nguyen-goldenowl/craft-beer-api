@@ -41,6 +41,7 @@ export class Order_items extends BaseEntity {
   order: Orders;
 
   @ManyToOne((_type) => Products, (products) => products.order_items, {
+    onDelete: 'CASCADE',
     eager: false,
   })
   @Exclude({ toPlainOnly: true })

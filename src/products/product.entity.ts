@@ -4,6 +4,7 @@ import {
   BaseEntity,
   Column,
   CreateDateColumn,
+  DeleteDateColumn,
   Entity,
   OneToMany,
   PrimaryGeneratedColumn,
@@ -35,6 +36,10 @@ export class Products extends BaseEntity {
 
   @Column({ default: false })
   sold_out: boolean;
+
+  @Column({ type: 'timestamp' })
+  @DeleteDateColumn({ type: 'timestamp', onUpdate: 'CURRENT_TIMESTAMP()' })
+  public deleted_at: Date;
 
   @CreateDateColumn({
     type: 'timestamp',
