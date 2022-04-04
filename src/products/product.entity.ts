@@ -10,6 +10,7 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
+import { ProductCategory } from './product-category.enum';
 
 @Entity()
 export class Products extends BaseEntity {
@@ -30,6 +31,9 @@ export class Products extends BaseEntity {
 
   @Column()
   information: string;
+
+  @Column()
+  category: ProductCategory;
 
   @Column()
   in_stock: number;

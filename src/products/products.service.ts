@@ -14,6 +14,7 @@ import { GetProductFilterDto } from './dto/get-product-filter.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { Products } from './product.entity';
 import { ProductsRepository } from './products.repository';
+import { categoryDto } from './dto/category.dto';
 
 @Injectable()
 export class ProductsService {
@@ -40,6 +41,13 @@ export class ProductsService {
     } else {
       return products;
     }
+  }
+
+  async getProductsByCategory(categoryDto: categoryDto): Promise<Products[]> {
+    const { category } = categoryDto;
+    const products = await this.productRepository.find({ where: { category } });
+
+    return products;
   }
 
   async getProductById(id: string): Promise<Products> {

@@ -15,6 +15,7 @@ import { diskStorage } from 'multer';
 import { fileName } from 'src/ultils/img-update.ultils';
 import { GetUser } from 'src/users/common/decorator/get-user.decorator';
 import { Users } from 'src/users/users.entity';
+import { categoryDto } from './dto/category.dto';
 
 import { CreateProductDto } from './dto/create-product.dto';
 import { GetProductFilterDto } from './dto/get-product-filter.dto';
@@ -101,5 +102,10 @@ export class ProductsController {
     @GetUser() user: Users,
   ): Promise<void> {
     return this.productsService.restoreProductById(id, user);
+  }
+
+  @Post('/category/:category')
+  getProductsByCategory(categoryDto: categoryDto): Promise<Products[]> {
+    return this.productsService.getProductsByCategory(categoryDto);
   }
 }
