@@ -1,3 +1,4 @@
+import { ApiProperty } from '@nestjs/swagger';
 import {
   IsEmail,
   IsNotEmpty,
@@ -9,6 +10,7 @@ import {
 
 export class SignUpDto {
   @IsEmail()
+  @ApiProperty()
   email: string;
 
   @IsString()
@@ -17,20 +19,26 @@ export class SignUpDto {
   @Matches(/((?=.*\d)|(?=.*\W+))(?![.\n])(?=.*[A-Z])(?=.*[a-z]).*$/, {
     message: 'Password not valid',
   })
+  @ApiProperty()
   password: string;
 
   @IsNotEmpty()
+  @ApiProperty()
   country: string;
 
   @IsNotEmpty()
+  @ApiProperty()
   street_address: string;
 
   @IsNotEmpty()
+  @ApiProperty()
   city: string;
 
   @IsNotEmpty()
+  @ApiProperty()
   state: string;
 
   @IsNotEmpty()
+  @ApiProperty()
   phone: string;
 }

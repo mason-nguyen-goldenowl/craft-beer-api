@@ -43,8 +43,7 @@ export class ProductsService {
     }
   }
 
-  async getProductsByCategory(categoryDto: categoryDto): Promise<Products[]> {
-    const { category } = categoryDto;
+  async getProductsByCategory(category: string): Promise<Products[]> {
     const products = await this.productRepository.find({ where: { category } });
 
     return products;
@@ -63,7 +62,7 @@ export class ProductsService {
   async createProduct(
     CreateProductDto: CreateProductDto,
     user: Users,
-    file,
+    file?,
   ): Promise<Products> {
     if (!user.is_admin) {
       throw new UnauthorizedException('Not allowed');
@@ -76,7 +75,7 @@ export class ProductsService {
       description,
       information,
       in_stock,
-      image_url: file.filename,
+      image_url: file?.filename,
     });
 
     await this.productRepository.save(product);
