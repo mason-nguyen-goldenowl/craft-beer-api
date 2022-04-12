@@ -1,4 +1,4 @@
-import { Controller, Post, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, UseGuards } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { ApiBearerAuth } from '@nestjs/swagger';
 import { GetUser } from 'src/users/common/decorator/get-user.decorator';
@@ -11,6 +11,12 @@ import { OrdersService } from './orders.service';
 @UseGuards(AuthGuard())
 export class OrdersController {
   constructor(private orderService: OrdersService) {}
+
+  @ApiBearerAuth('authorization')
+  @Get('/')
+  getOrders(@GetUser() user: Users): Promise<Orders[]> {
+    return this.orderService.getOrders(user);
+  }
 
   @ApiBearerAuth('authorization')
   @Post('/create')

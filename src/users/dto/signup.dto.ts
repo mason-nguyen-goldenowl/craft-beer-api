@@ -23,22 +23,27 @@ export class SignUpDto {
   password: string;
 
   @IsNotEmpty()
+  @IsString()
   @ApiProperty()
   country: string;
 
   @IsNotEmpty()
+  @IsString()
   @ApiProperty()
   street_address: string;
 
   @IsNotEmpty()
+  @IsString()
   @ApiProperty()
   city: string;
 
   @IsNotEmpty()
+  @IsString()
   @ApiProperty()
   state: string;
 
   @IsNotEmpty()
+  @IsString()
   @ApiProperty()
   phone: string;
 }

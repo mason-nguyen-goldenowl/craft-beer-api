@@ -14,8 +14,13 @@ export class CartItemService {
   ) {}
 
   async getCartItem(cart: Carts): Promise<Cart_items[]> {
-    const cartItems = await this.cartItemsRepository.find({ where: { cart } });
-
+    const cartItems = await this.cartItemsRepository.find({
+      where: { cart },
+      order: { created_at: 'ASC' },
+    });
+    // cartItems.sort((itemA, itemB) => {
+    //   return itemA.price - itemB.price;
+    // });
     return cartItems;
   }
 

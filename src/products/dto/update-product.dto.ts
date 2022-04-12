@@ -25,4 +25,8 @@ export class UpdateProductDto {
   @IsOptional()
   @ApiPropertyOptional()
   in_stock: number;
+
+  @IsOptional()
+  @ApiPropertyOptional()
+  category: string;
 }

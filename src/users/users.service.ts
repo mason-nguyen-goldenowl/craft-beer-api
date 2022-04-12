@@ -15,6 +15,7 @@ import { JwtPayLoad, RtPayLoad } from './jwt.payload';
 import { JwtService } from '@nestjs/jwt';
 import { Carts } from 'src/carts/carts.entity';
 import { ConfigService } from '@nestjs/config';
+import { RefreshDto } from './dto/refresh.dto';
 
 @Injectable()
 export class UsersService {
@@ -25,24 +26,26 @@ export class UsersService {
     private config: ConfigService,
   ) {}
 
-  async signUp(signUpDto: SignUpDto): Promise<void> {
-    const { email, password, country, street_address, city, state, phone } =
-      signUpDto;
-
-    const salt = await bcrypt.genSalt();
-    const hashedPassword = await bcrypt.hash(password, salt);
-    const user = this.usersRepository.create({
-      email,
-      city,
-      state,
-      phone,
-      country,
-      street_address,
-      password: hashedPassword,
-    });
+  async signUp(signUpDto: SignUpDto): Promise<Users> {
     try {
+      const { email, password, country, street_address, city, state, phone } =
+        signUpDto;
+
+      const salt = await bcrypt.genSalt();
+      const hashedPassword = await bcrypt.hash(password, salt);
+      const user = this.usersRepository.create({
+        email,
+        city,
+        state,
+        phone,
+        country,
+        street_address,
+        password: hashedPassword,
+      });
       await this.usersRepository.save(user);
+      return user;
     } catch (error) {
+      console.log(error);
       if (error.code === '23505') {
         throw new ConflictException('Username already exists');
       } else {
@@ -53,7 +56,7 @@ export class UsersService {
 
   async signIn(
     signInDto: SignInDto,
-  ): Promise<{ accessToken: string; refreshToken: string }> {
+  ): Promise<{ accessToken: string; refreshToken: string; user: Users }> {
     const { email, password } = signInDto;
 
     const user = await this.usersRepository.findOne({ where: { email } });
@@ -82,7 +85,7 @@ export class UsersService {
     user.hashedRT = hashedRTToken;
     await this.usersRepository.save(user);
 
-    return { accessToken, refreshToken };
+    return { accessToken, refreshToken, user };
   }
 
   async logOut(email: string): Promise<void> {
@@ -92,15 +95,14 @@ export class UsersService {
   }
 
   async refreshTokens(
-    JwtPayLoad: JwtPayLoad,
-    rt: string,
-  ): Promise<{ accessToken: string; refreshToken: string }> {
-    const { email } = JwtPayLoad;
+    refreshDto: RefreshDto,
+  ): Promise<{ accessToken: string; rt: string }> {
+    const { email, refreshToken } = refreshDto;
     const userRefresh = await this.usersRepository.findOne({
       where: { email },
     });
 
-    const rtMatches = await bcrypt.compare(rt, userRefresh.hashedRT);
+    const rtMatches = await bcrypt.compare(refreshToken, userRefresh.hashedRT);
     if (!rtMatches) throw new ForbiddenException('Access Denied');
     const payload: JwtPayLoad = { email };
     const accessToken: string = await this.jwtService.sign(payload, {
@@ -109,16 +111,16 @@ export class UsersService {
     });
 
     const RtPayLoad: RtPayLoad = { email, id: userRefresh.id };
-    const refreshToken: string = await this.jwtService.sign(RtPayLoad, {
+    const rt: string = await this.jwtService.sign(RtPayLoad, {
       secret: this.config.get<string>('RT_JWT_SECRET'),
       expiresIn: 60 * 60 * 24 * 7,
     });
     const salt = await bcrypt.genSalt();
-    const hashedRTToken = await bcrypt.hash(refreshToken, salt);
+    const hashedRTToken = await bcrypt.hash(rt, salt);
 
     userRefresh.hashedRT = hashedRTToken;
     await this.usersRepository.save(userRefresh);
-    return { accessToken, refreshToken };
+    return { accessToken, rt };
   }
 
   async updateCartUser(user: Users, cart: Carts): Promise<void> {

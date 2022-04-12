@@ -33,7 +33,7 @@ export class Orders extends BaseEntity {
   })
   public updated_at: Date;
 
-  @ManyToOne((_type) => Users, (user) => user.orders, { eager: false })
+  @ManyToOne((_type) => Users, (user) => user.orders, { eager: true })
   @Exclude({ toPlainOnly: true })
   user: Users;
 

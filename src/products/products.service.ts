@@ -6,6 +6,7 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CartItemService } from 'src/cart_item/cart_item.service';
+import { Carts } from 'src/carts/carts.entity';
 import { CartsService } from 'src/carts/carts.service';
 import { Users } from 'src/users/users.entity';
 
@@ -14,7 +15,6 @@ import { GetProductFilterDto } from './dto/get-product-filter.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { Products } from './product.entity';
 import { ProductsRepository } from './products.repository';
-import { categoryDto } from './dto/category.dto';
 
 @Injectable()
 export class ProductsService {
@@ -62,12 +62,13 @@ export class ProductsService {
   async createProduct(
     CreateProductDto: CreateProductDto,
     user: Users,
-    file?,
+    file,
   ): Promise<Products> {
     if (!user.is_admin) {
       throw new UnauthorizedException('Not allowed');
     }
-    const { name, price, description, information, in_stock } =
+
+    const { name, price, description, information, in_stock, category } =
       CreateProductDto;
     const product = this.productRepository.create({
       name,
@@ -75,6 +76,7 @@ export class ProductsService {
       description,
       information,
       in_stock,
+      category,
       image_url: file?.filename,
     });
 
@@ -92,7 +94,7 @@ export class ProductsService {
       throw new UnauthorizedException('Not allowed');
     }
     const product = await this.getProductById(id);
-    const { name, description, information, price, in_stock } =
+    const { name, description, information, price, in_stock, category } =
       UpdateProductDto;
 
     if (name) {
@@ -109,6 +111,9 @@ export class ProductsService {
     }
     if (in_stock) {
       product.in_stock = in_stock;
+    }
+    if (category) {
+      product.category = category;
     }
     if (file) {
       product.image_url = file.filename;
@@ -130,7 +135,7 @@ export class ProductsService {
     await this.productRepository.save(product);
   }
 
-  async addToCart(id: string, user: Users): Promise<void> {
+  async addToCart(id: string, user: Users): Promise<Carts> {
     const product = await this.getProductById(id);
 
     let cart = await this.cartsService.getCart(user);
@@ -148,6 +153,7 @@ export class ProductsService {
         price: product.price,
       });
     }
+    return cart;
   }
 
   async deleteProductById(id: string, user: Users): Promise<void> {

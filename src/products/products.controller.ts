@@ -13,6 +13,7 @@ import { AuthGuard } from '@nestjs/passport';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ApiBearerAuth, ApiBody, ApiCreatedResponse } from '@nestjs/swagger';
 import { diskStorage } from 'multer';
+import { Carts } from 'src/carts/carts.entity';
 import { fileName } from 'src/ultils/img-update.ultils';
 import { GetUser } from 'src/users/common/decorator/get-user.decorator';
 import { Users } from 'src/users/users.entity';
@@ -89,7 +90,7 @@ export class ProductsController {
   createProduct(
     @Body() CreateProductDto: CreateProductDto,
     @GetUser() user: Users,
-    @UploadedFile() file,
+    @UploadedFile() file: Express.Multer.File,
   ): Promise<Products> {
     return this.productsService.createProduct(CreateProductDto, user, file);
   }
@@ -130,7 +131,7 @@ export class ProductsController {
     status: 200,
     description: 'The product has been successfully added to cart.',
   })
-  addToCart(@Param('id') id: string, @GetUser() user: Users): Promise<void> {
+  addToCart(@Param('id') id: string, @GetUser() user: Users): Promise<Carts> {
     return this.productsService.addToCart(id, user);
   }
 

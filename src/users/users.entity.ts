@@ -59,6 +59,6 @@ export class Users extends BaseEntity {
   @OneToOne((_type) => Carts, (cart) => cart.user)
   @JoinColumn()
   cart: Carts;
-  @OneToMany((_type) => Orders, (order) => order.user, { eager: true })
+  @OneToMany((_type) => Orders, (order) => order.user, { eager: false })
   orders: Orders[];
 }

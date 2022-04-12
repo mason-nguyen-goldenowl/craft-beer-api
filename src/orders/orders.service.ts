@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CartsService } from 'src/carts/carts.service';
 import { CartItemService } from 'src/cart_item/cart_item.service';
@@ -17,9 +17,12 @@ export class OrdersService {
     private orderItemService: OrderItemService,
   ) {}
 
-  async getOrder(user: Users): Promise<Orders> {
-    const order = await this.ordersRepository.findOne({ where: { user } });
-    return order;
+  async getOrders(user: Users): Promise<Orders[]> {
+    if (!user.is_admin) {
+      throw new UnauthorizedException('Not allowed');
+    }
+    const orders = await this.ordersRepository.find();
+    return orders;
   }
 
   async createOrder(user: Users): Promise<Orders> {

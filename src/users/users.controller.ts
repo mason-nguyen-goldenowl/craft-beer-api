@@ -1,12 +1,11 @@
 import { Body, Controller, Post, UseGuards } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
-import { ApiBearerAuth, ApiBody, ApiCreatedResponse } from '@nestjs/swagger';
+import { ApiBody, ApiCreatedResponse } from '@nestjs/swagger';
 
-import { GetRT } from './common/decorator/get-user.decorator';
 import { RefreshDto } from './dto/refresh.dto';
 import { SignInDto } from './dto/signIn.dto';
 import { SignUpDto } from './dto/signup.dto';
-import { JwtPayLoad } from './jwt.payload';
+import { Users } from './users.entity';
 import { UsersService } from './users.service';
 
 @Controller('users')
@@ -18,7 +17,7 @@ export class UsersController {
     status: 201,
     description: 'The user has been successfully created.',
   })
-  signUp(@Body() signUpDto: SignUpDto): Promise<void> {
+  signUp(@Body() signUpDto: SignUpDto): Promise<Users> {
     return this.userService.signUp(signUpDto);
   }
 
@@ -29,7 +28,7 @@ export class UsersController {
   })
   signIn(
     @Body() signInDto: SignInDto,
-  ): Promise<{ accessToken: string; refreshToken: string }> {
+  ): Promise<{ accessToken: string; refreshToken: string; user: Users }> {
     return this.userService.signIn(signInDto);
   }
 
@@ -44,16 +43,14 @@ export class UsersController {
   }
 
   @Post('/refresh')
-  @ApiBearerAuth('authorization')
   @ApiBody({ type: RefreshDto })
   @ApiCreatedResponse({
     status: 200,
     description: 'You have gotten new tokens',
   })
   refreshTokens(
-    @Body() JwtPayLoad: JwtPayLoad,
-    @GetRT() rt: string,
-  ): Promise<{ accessToken: string; refreshToken: string }> {
-    return this.userService.refreshTokens(JwtPayLoad, rt);
+    @Body() refreshDto: RefreshDto,
+  ): Promise<{ accessToken: string; rt: string }> {
+    return this.userService.refreshTokens(refreshDto);
   }
 }

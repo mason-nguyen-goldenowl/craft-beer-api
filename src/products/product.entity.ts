@@ -58,7 +58,7 @@ export class Products extends BaseEntity {
   public updated_at: Date;
 
   @OneToMany((_type) => Order_items, (order_items) => order_items.product, {
-    eager: true,
+    eager: false,
   })
   order_items: Order_items[];
 

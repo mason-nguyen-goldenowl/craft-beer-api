@@ -42,7 +42,7 @@ export class Order_items extends BaseEntity {
 
   @ManyToOne((_type) => Products, (products) => products.order_items, {
     onDelete: 'CASCADE',
-    eager: false,
+    eager: true,
   })
   @Exclude({ toPlainOnly: true })
   product: Products;
