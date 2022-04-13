@@ -9,4 +9,8 @@ export class GetProductFilterDto {
   @IsOptional()
   @ApiPropertyOptional()
   highPrice?: number;
+
+  @IsOptional()
+  @ApiPropertyOptional()
+  category?: string[];
 }

@@ -18,9 +18,7 @@ export class CartItemService {
       where: { cart },
       order: { created_at: 'ASC' },
     });
-    // cartItems.sort((itemA, itemB) => {
-    //   return itemA.price - itemB.price;
-    // });
+
     return cartItems;
   }
 

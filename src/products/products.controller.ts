@@ -12,13 +12,12 @@ import {
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { ApiBearerAuth, ApiBody, ApiCreatedResponse } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiCreatedResponse } from '@nestjs/swagger';
 import { diskStorage } from 'multer';
 import { Carts } from 'src/carts/carts.entity';
 import { fileName } from 'src/ultils/img-update.ultils';
 import { GetUser } from 'src/users/common/decorator/get-user.decorator';
 import { Users } from 'src/users/users.entity';
-import { categoryDto } from './dto/category.dto';
 
 import { CreateProductDto } from './dto/create-product.dto';
 import { GetProductFilterDto } from './dto/get-product-filter.dto';
@@ -46,20 +45,13 @@ export class ProductsController {
     return this.productsService.paginateProduct(query);
   }
 
-  @Get('filter')
-  filterProduct(@Query() query): Promise<Products[]> {
-    return this.productsService.filterProduct(query);
-  }
-
-  @Get('/:category')
+  @Post('/filter')
   @ApiCreatedResponse({
     status: 200,
     description: 'The api has been successfully fetched.',
   })
-  getProductsByCategory(
-    @Param('category') category: string,
-  ): Promise<Products[]> {
-    return this.productsService.getProductsByCategory(category);
+  filterProduct(@Body() filterDto: GetProductFilterDto): Promise<Products[]> {
+    return this.productsService.filterProduct(filterDto);
   }
 
   @ApiCreatedResponse({

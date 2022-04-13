@@ -9,8 +9,10 @@ import { CartItemService } from 'src/cart_item/cart_item.service';
 import { Carts } from 'src/carts/carts.entity';
 import { CartsService } from 'src/carts/carts.service';
 import { Users } from 'src/users/users.entity';
+import { In } from 'typeorm';
 
 import { CreateProductDto } from './dto/create-product.dto';
+import { GetProductFilterDto } from './dto/get-product-filter.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { Products } from './product.entity';
 import { ProductsRepository } from './products.repository';
@@ -30,14 +32,30 @@ export class ProductsService {
     return products;
   }
 
-  async filterProduct(query): Promise<Products[]> {
-    const products = await this.getProducts();
-    const productFilter = (await products).filter(
-      (product) =>
-        product.price >= query.lowPrice && product.price <= query.highPrice,
-    );
-    console.log(query);
-    return productFilter;
+  async filterProduct(filterDto: GetProductFilterDto): Promise<Products[]> {
+    let productFilter = [];
+    let result = [];
+
+    if (filterDto.category.length > 0) {
+      productFilter = await this.productRepository.find({
+        where: { category: In(filterDto.category) },
+      });
+      result = productFilter.filter(
+        (product) =>
+          product.price >= filterDto.lowPrice &&
+          product.price <= filterDto.highPrice,
+      );
+    } else {
+      result = await (
+        await this.productRepository.find()
+      ).filter(
+        (product) =>
+          product.price >= filterDto.lowPrice &&
+          product.price <= filterDto.highPrice,
+      );
+    }
+
+    return result;
   }
 
   async paginateProduct(
@@ -50,7 +68,7 @@ export class ProductsService {
     const totalPage = Math.ceil((await this.getProducts()).length / perPage);
     builder.offset((page - 1) * perPage).limit(perPage);
     const products = await builder.getMany();
-    console.log(totalPage);
+
     return { arrProduct: products, totalPage };
   }
 

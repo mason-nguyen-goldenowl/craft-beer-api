@@ -1,5 +1,6 @@
 import { Controller, Delete, Param, Post } from '@nestjs/common';
-import { ApiBearerAuth, ApiCreatedResponse, ApiParam } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiCreatedResponse } from '@nestjs/swagger';
+
 import { Cart_items } from './cart_item.entity';
 import { CartItemService } from './cart_item.service';
 
