@@ -5,6 +5,7 @@ import {
   Get,
   Param,
   Post,
+  Query,
   UploadedFile,
   UseGuards,
   UseInterceptors,
@@ -29,7 +30,7 @@ import { ProductsService } from './products.service';
 export class ProductsController {
   constructor(private productsService: ProductsService) {}
 
-  @Get()
+  @Get('/all')
   @ApiCreatedResponse({
     status: 200,
     description: 'The api has been successfully fetched.',
@@ -38,7 +39,23 @@ export class ProductsController {
     return this.productsService.getProducts();
   }
 
+  @Get()
+  paginateProductst(
+    @Query('page') query: string,
+  ): Promise<{ arrProduct: Products[]; totalPage: number }> {
+    return this.productsService.paginateProduct(query);
+  }
+
+  @Get('filter')
+  filterProduct(@Query() query): Promise<Products[]> {
+    return this.productsService.filterProduct(query);
+  }
+
   @Get('/:category')
+  @ApiCreatedResponse({
+    status: 200,
+    description: 'The api has been successfully fetched.',
+  })
   getProductsByCategory(
     @Param('category') category: string,
   ): Promise<Products[]> {

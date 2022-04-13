@@ -30,8 +30,32 @@ export class ProductsService {
     return products;
   }
 
+  async filterProduct(query): Promise<Products[]> {
+    const products = await this.getProducts();
+    const productFilter = (await products).filter(
+      (product) =>
+        product.price >= query.lowPrice && product.price <= query.highPrice,
+    );
+    console.log(query);
+    return productFilter;
+  }
+
+  async paginateProduct(
+    query,
+  ): Promise<{ arrProduct: Products[]; totalPage: number }> {
+    const builder = this.productRepository.createQueryBuilder('product');
+    const page = query || 1;
+    const perPage = 8;
+
+    const totalPage = Math.ceil((await this.getProducts()).length / perPage);
+    builder.offset((page - 1) * perPage).limit(perPage);
+    const products = await builder.getMany();
+    console.log(totalPage);
+    return { arrProduct: products, totalPage };
+  }
+
   async getProductsByCategory(category: string): Promise<Products[]> {
-    const products = this.getProducts();
+    const products = await this.getProducts();
     const productsCategory = (await products).filter(
       (product) => product.category === category,
     );
