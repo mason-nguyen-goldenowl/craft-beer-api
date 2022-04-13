@@ -36,7 +36,7 @@ export class ProductsService {
     let productFilter = [];
     let result = [];
 
-    if (filterDto.category.length > 0) {
+    if (filterDto.category?.length > 0) {
       productFilter = await this.productRepository.find({
         where: { category: In(filterDto.category) },
       });
