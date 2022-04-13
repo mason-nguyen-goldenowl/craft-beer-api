@@ -1,7 +1,18 @@
-import { BaseEntity, Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { Cart_items } from 'src/cart_item/cart_item.entity';
+import { Order_items } from 'src/order_item/order_item.entity';
+import {
+  BaseEntity,
+  Column,
+  CreateDateColumn,
+  DeleteDateColumn,
+  Entity,
+  OneToMany,
+  PrimaryGeneratedColumn,
+  UpdateDateColumn,
+} from 'typeorm';
 
 @Entity()
-export class Product extends BaseEntity {
+export class Products extends BaseEntity {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
@@ -11,12 +22,46 @@ export class Product extends BaseEntity {
   @Column()
   price: number;
 
+  @Column({ nullable: true })
+  image_url: string;
+
   @Column()
   description: string;
 
   @Column()
   information: string;
 
+  @Column({ default: 'Uncategorized' })
+  category: string;
+
   @Column()
   in_stock: number;
+
+  @Column({ default: false })
+  sold_out: boolean;
+
+  @Column({ type: 'timestamp' })
+  @DeleteDateColumn({ type: 'timestamp', onUpdate: 'CURRENT_TIMESTAMP()' })
+  public deleted_at: Date;
+
+  @CreateDateColumn({
+    type: 'timestamp',
+    default: () => 'CURRENT_TIMESTAMP()',
+  })
+  public created_at: Date;
+
+  @UpdateDateColumn({
+    type: 'timestamp',
+    default: () => 'CURRENT_TIMESTAMP()',
+    onUpdate: 'CURRENT_TIMESTAMP()',
+  })
+  public updated_at: Date;
+
+  @OneToMany((_type) => Order_items, (order_items) => order_items.product, {
+    eager: false,
+  })
+  order_items: Order_items[];
+
+  @OneToMany((_type) => Cart_items, (cart_items) => cart_items.product)
+  cart_items: Cart_items[];
 }
