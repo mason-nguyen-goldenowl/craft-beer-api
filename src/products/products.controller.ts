@@ -17,6 +17,7 @@ import { Carts } from 'src/carts/carts.entity';
 import { fileName } from 'src/ultils/img-update.ultils';
 import { GetUser } from 'src/users/common/decorator/get-user.decorator';
 import { Users } from 'src/users/users.entity';
+import { categoryDto } from './dto/category.dto';
 
 import { CreateProductDto } from './dto/create-product.dto';
 import { GetProductFilterDto } from './dto/get-product-filter.dto';
@@ -33,15 +34,15 @@ export class ProductsController {
     status: 200,
     description: 'The api has been successfully fetched.',
   })
-  @ApiBody({
-    required: false,
-    description:
-      'If you want to filter product please add lowPrice and highPrice or Empty body to get all products',
-    examples: undefined,
-    type: GetProductFilterDto,
-  })
-  getProducts(@Body() filterDto?: GetProductFilterDto): Promise<Products[]> {
-    return this.productsService.getProducts(filterDto);
+  getProducts(): Promise<Products[]> {
+    return this.productsService.getProducts();
+  }
+
+  @Get('/:category')
+  getProductsByCategory(
+    @Param('category') category: string,
+  ): Promise<Products[]> {
+    return this.productsService.getProductsByCategory(category);
   }
 
   @ApiCreatedResponse({
@@ -51,11 +52,6 @@ export class ProductsController {
   @Get('/:id')
   getProductById(@Param('id') id: string): Promise<Products> {
     return this.productsService.getProductById(id);
-  }
-
-  @Get('/category')
-  getProductByCategory(@Body() category: string): Promise<Products[]> {
-    return this.productsService.getProductsByCategory(category);
   }
 
   @UseGuards(AuthGuard())

@@ -11,7 +11,6 @@ import { CartsService } from 'src/carts/carts.service';
 import { Users } from 'src/users/users.entity';
 
 import { CreateProductDto } from './dto/create-product.dto';
-import { GetProductFilterDto } from './dto/get-product-filter.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { Products } from './product.entity';
 import { ProductsRepository } from './products.repository';
@@ -25,28 +24,18 @@ export class ProductsService {
     private cartItemsService: CartItemService,
   ) {}
 
-  async getProducts(filterDto: GetProductFilterDto): Promise<Products[]> {
-    const { lowPrice, highPrice } = filterDto;
+  async getProducts(): Promise<Products[]> {
     const products = await this.productRepository.find();
-    const filterProducts = [];
 
-    products.map((product) => {
-      if (product.price >= lowPrice && product.price <= highPrice) {
-        filterProducts.push(product);
-      }
-    });
-
-    if (Object.keys(filterDto).length > 0) {
-      return filterProducts;
-    } else {
-      return products;
-    }
+    return products;
   }
 
   async getProductsByCategory(category: string): Promise<Products[]> {
-    const products = await this.productRepository.find({ where: { category } });
-
-    return products;
+    const products = this.getProducts();
+    const productsCategory = (await products).filter(
+      (product) => product.category === category,
+    );
+    return productsCategory;
   }
 
   async getProductById(id: string): Promise<Products> {
